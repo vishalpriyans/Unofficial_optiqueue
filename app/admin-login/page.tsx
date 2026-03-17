@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
+import { LoginVideoLoader } from "@/components/ui/login-video-loader"
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("")
@@ -11,6 +12,7 @@ export default function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [showVideoAnimation, setShowVideoAnimation] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -34,10 +36,8 @@ export default function AdminLoginPage() {
       const data = await response.json()
 
       if (data.success) {
-        // Wait a moment for cookie to be set, then redirect
-        await new Promise(resolve => setTimeout(resolve, 100))
-        // Use window.location for full page reload to ensure cookie is read
-        window.location.href = "/"
+        // Show video animation before redirecting
+        setShowVideoAnimation(true)
       } else {
         setError(data.message || "Invalid admin credentials")
       }
@@ -46,6 +46,21 @@ export default function AdminLoginPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleVideoEnd = () => {
+    // Redirect to admin dashboard after video ends
+    window.location.href = "/"
+  }
+
+  if (showVideoAnimation) {
+    return (
+      <LoginVideoLoader 
+        message="Welcome to Admin Portal!"
+        videoSrc="/OptiQueque_Logo_Animation_Creation.mp4"
+        onVideoEnd={handleVideoEnd}
+      />
+    )
   }
 
   return (
